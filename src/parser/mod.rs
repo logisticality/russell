@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::lex::Token;
+use crate::lexer::Token;
 
 pub enum Exp {
     Int(i64),

@@ -3,10 +3,8 @@ use std::fs;
 use std::process::ExitCode;
 
 mod error;
-mod interp;
-mod lex;
-mod parse;
-mod typecheck;
+mod lexer;
+mod parser;
 
 fn main() -> ExitCode {
     // read the program
@@ -21,7 +19,7 @@ fn main() -> ExitCode {
     };
 
     // lex the program
-    let tokens = match lex::lex(&program) {
+    let tokens = match lexer::lex(&program) {
         Ok(tokens) => tokens,
         Err(err) => {
             eprintln!("FATAL ERROR: {}", error::report_error(err, &program));
@@ -30,17 +28,13 @@ fn main() -> ExitCode {
     };
 
     // parse the program
-    let exps = match parse::parse(tokens) {
+    let exps = match parser::parse(tokens) {
         Ok(exps) => exps,
         Err(err) => {
             eprintln!("FATAL ERROR: {}", error::report_error(err, &program));
             return ExitCode::FAILURE;
         }
     };
-
-    // typecheck the program
-
-    // run the program
 
     ExitCode::SUCCESS
 }

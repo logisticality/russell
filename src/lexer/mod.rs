@@ -30,7 +30,7 @@ pub fn lex(program: &String) -> Result<Vec<Token>, Error> {
 /// offset
 fn next_token(program: &String, offset: usize) -> (Result<Token, Error>, usize) {
     // eat whitespace
-    for (position, character) in &program[offset..] {}
+    let program = program.trim_start();
 
     unimplemented!()
 }
