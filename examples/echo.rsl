@@ -1,0 +1,12 @@
+fn main() -> i64 {
+    echo bool true;
+    echo bool false;
+    echo i64 0;
+    echo i64 100;
+    echo i64 -100;
+    echo u64 0;
+    echo u64 100;
+    echo f64 0.0;
+    echo f64 100.0;
+    echo f64 -100.0;
+}

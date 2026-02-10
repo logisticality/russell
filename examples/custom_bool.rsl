@@ -1,0 +1,48 @@
+typedef custom_bool {
+    c_true(),
+    c_false()
+}
+
+fn convert_to_normal(x: custom_bool) -> bool {
+    return match x {
+        c_true() -> true,
+        c_false() -> false
+    };
+}
+
+fn custom_if_u64(cond: custom_bool, then_b: u64, else_b: u64) -> u64 {
+    return match cond {
+        c_true() -> then_b,
+        c_false() -> false_b
+    };
+}
+
+fn custom_if_i64(cond: custom_bool, then_b: i64, else_b: i64) -> i64 {
+    return match cond {
+        c_true() -> then_b,
+        c_false() -> false_b
+    };
+}
+
+fn custom_if_f64(cond: custom_bool, then_b: f64, else_b: f64) -> f64 {
+    return match cond {
+        c_true() -> then_b,
+        c_false() -> false_b
+    };
+}
+
+fn main() -> i64 {
+    echo bool convert_to_normal(c_true());
+    echo bool convert_to_normal(c_false());
+
+    echo u64 custom_if_u64(c_true(), 0, 1);
+    echo u64 custom_if_u64(c_false(), 0, 1);
+
+    echo i64 custom_if_i64(c_true(), 0, 1);
+    echo i64 custom_if_i64(c_false(), 0, 1);
+
+    echo f64 custom_if_f64(c_true(), 0, 1);
+    echo f64 custom_if_f64(c_false(), 0, 1);
+
+    return 0;
+}
