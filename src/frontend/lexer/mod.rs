@@ -1,6 +1,6 @@
 pub mod token;
 
-use crate::lexer::token::{Token, TokenType};
+use crate::frontend::lexer::token::{Token, TokenType};
 
 // reserved keywords
 const KEYWORDS: [(&str, TokenType); 12] = [
@@ -111,10 +111,10 @@ fn read_num(program: &str) -> (TokenType, &str) {
     let digits = &program[..first_non_digit];
     let rest = &program[first_non_digit..];
 
-    return match digits.find('.') {
+    match digits.find('.') {
         Some(_) => (TokenType::Float(digits.parse::<f64>().unwrap()), rest),
         None => (TokenType::Int(digits.parse::<u64>().unwrap()), rest),
-    };
+    }
 }
 
 fn is_digit(c: char) -> bool {

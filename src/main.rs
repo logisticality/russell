@@ -2,9 +2,7 @@ use std::env;
 use std::fs;
 use std::process::ExitCode;
 
-mod error;
-mod lexer;
-mod parser;
+mod frontend;
 
 fn main() -> ExitCode {
     // read the program
@@ -25,8 +23,8 @@ fn main() -> ExitCode {
     };
 
     // lex the program
-    let tokens = lexer::lex(&program);
+    let tokens = frontend::lexer::lex(&program);
 
-    // println!("{tokens}");
+    println!("{:?}", tokens);
     ExitCode::SUCCESS
 }
