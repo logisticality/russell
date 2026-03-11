@@ -66,3 +66,9 @@ pub struct Binding {
     pub id: String,
     pub typ: Type,
 }
+
+impl Binding {
+    pub fn new(id: String, typ: Type) -> Binding {
+        Binding { id, typ }
+    }
+}

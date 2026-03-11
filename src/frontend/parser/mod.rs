@@ -45,6 +45,16 @@ impl Parser {
         }
     }
 
+    pub fn expect_many(&mut self, expected: Vec<TokenKind>) -> ParseResult<Token> {
+        for token in &expected {
+            if self.peek().kind() == *token {
+                return Ok(self.tokens.next().unwrap());
+            }
+        }
+
+        ParseError::many(expected, self.peek().clone())
+    }
+
     pub fn peek(&mut self) -> &Token {
         // EoF sentinel ensures this is always Some
         self.tokens.peek().unwrap()
@@ -62,6 +72,10 @@ impl ParseError {
             expected: vec![expected],
             actual,
         })
+    }
+
+    pub fn many<A>(expected: Vec<TokenKind>, actual: Token) -> ParseResult<A> {
+        Err(ParseError { expected, actual })
     }
 }
 

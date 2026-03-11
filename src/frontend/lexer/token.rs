@@ -55,7 +55,7 @@ pub enum Token {
     EoF,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum TokenKind {
     // primitive values
     Id,
