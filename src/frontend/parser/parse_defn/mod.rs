@@ -17,13 +17,8 @@ pub(super) fn parse_defn(parser: &mut Parser) -> ParseResult<Defn> {
 fn parse_typedef(parser: &mut Parser) -> ParseResult<Defn> {
     // parse the declaration
     parser.expect(TokenKind::Typedef)?;
-    let name = match parser.expect(TokenKind::TypeId)? {
-        Token::TypeId(id) => id,
-        _ => unreachable!(),
-    };
+    let name = parser.expect_typeid()?;
     parser.expect(TokenKind::LBrace)?;
-
-    // Typedef(String, Vec<(String, Vec<Binding>)>)
 
     // parse all product types in the ADT
     let mut signatures = Vec::new();
@@ -68,12 +63,7 @@ fn parse_fndef(parser: &mut Parser) -> ParseResult<Defn> {
 /// Returns the ID and a list of bindings if successful.
 /// Returns an error otherwise.
 fn parse_fn_sig(parser: &mut Parser) -> ParseResult<(String, Vec<Binding>)> {
-    let id = match parser.expect(TokenKind::Id)? {
-        Token::Id(str) => str,
-        _ => unreachable!(),
-    };
-
+    let id = parser.expect_id()?;
     let bindings = parse_binding_list(parser)?;
-
     Ok((id, bindings))
 }

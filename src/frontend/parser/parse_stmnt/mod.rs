@@ -19,10 +19,7 @@ pub(super) fn parse_stmnt(parser: &mut Parser) -> ParseResult<Stmnt> {
 
 fn parse_let(parser: &mut Parser) -> ParseResult<Stmnt> {
     parser.expect(TokenKind::Let)?;
-    let id = match parser.expect(TokenKind::Id)? {
-        Token::Id(str) => str,
-        _ => unreachable!(),
-    };
+    let id = parser.expect_id()?;
     parser.expect(TokenKind::Eq)?;
     let expr = parse_expr(parser)?;
     parser.expect(TokenKind::Semicolon)?;
@@ -32,10 +29,7 @@ fn parse_let(parser: &mut Parser) -> ParseResult<Stmnt> {
 fn parse_read(parser: &mut Parser) -> ParseResult<Stmnt> {
     parser.expect(TokenKind::Read)?;
     let read_type = parse_type(parser)?;
-    let id = match parser.expect(TokenKind::Id)? {
-        Token::Id(str) => str,
-        _ => unreachable!(),
-    };
+    let id = parser.expect_id()?;
     parser.expect(TokenKind::Semicolon)?;
     Ok(Stmnt::Read(read_type, id))
 }

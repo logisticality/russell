@@ -1,6 +1,6 @@
 use crate::frontend::lexer::token::{Token, TokenKind};
 use crate::frontend::parser::ast::{Binding, Type};
-use crate::frontend::parser::{ParseError, ParseResult, Parser};
+use crate::frontend::parser::{ParseResult, Parser};
 
 pub(super) fn parse_type(parser: &mut Parser) -> ParseResult<Type> {
     // parse an atomic type
@@ -29,10 +29,7 @@ pub(super) fn parse_type(parser: &mut Parser) -> ParseResult<Type> {
 }
 
 pub(super) fn parse_binding(parser: &mut Parser) -> ParseResult<Binding> {
-    let id = match parser.expect(TokenKind::Id)? {
-        Token::Id(str) => str,
-        _ => unreachable!(),
-    };
+    let id = parser.expect_id()?;
     parser.expect(TokenKind::Colon)?;
     let id_type = parse_type(parser)?;
     Ok(Binding::new(id, id_type))

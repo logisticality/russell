@@ -37,11 +37,47 @@ impl Parser {
         }
     }
 
-    pub fn expect(&mut self, expected: TokenKind) -> ParseResult<Token> {
+    pub fn expect(&mut self, expected: TokenKind) -> ParseResult<()> {
         if self.peek().kind() == expected {
-            Ok(self.tokens.next().unwrap())
+            self.tokens.next();
+            Ok(())
         } else {
             ParseError::new(expected, self.peek().clone())
+        }
+    }
+
+    pub fn expect_id(&mut self) -> ParseResult<String> {
+        match self.tokens.next_if(|t| t.kind() == TokenKind::Id) {
+            Some(Token::Id(name)) => Ok(name),
+            _ => ParseError::new(TokenKind::Id, self.peek().clone()),
+        }
+    }
+
+    pub fn expect_int(&mut self) -> ParseResult<i64> {
+        match self.tokens.next_if(|t| t.kind() == TokenKind::Int) {
+            Some(Token::Int(val)) => Ok(val),
+            _ => ParseError::new(TokenKind::Int, self.peek().clone()),
+        }
+    }
+
+    pub fn expect_float(&mut self) -> ParseResult<f64> {
+        match self.tokens.next_if(|t| t.kind() == TokenKind::Float) {
+            Some(Token::Float(val)) => Ok(val),
+            _ => ParseError::new(TokenKind::Float, self.peek().clone()),
+        }
+    }
+
+    pub fn expect_bool(&mut self) -> ParseResult<bool> {
+        match self.tokens.next_if(|t| t.kind() == TokenKind::Bool) {
+            Some(Token::Bool(val)) => Ok(val),
+            _ => ParseError::new(TokenKind::Bool, self.peek().clone()),
+        }
+    }
+
+    pub fn expect_typeid(&mut self) -> ParseResult<String> {
+        match self.tokens.next_if(|t| t.kind() == TokenKind::TypeId) {
+            Some(Token::TypeId(name)) => Ok(name),
+            _ => ParseError::new(TokenKind::TypeId, self.peek().clone()),
         }
     }
 
