@@ -26,7 +26,7 @@ const TYPES: [(&str, Token); 3] = [
 ];
 
 // operators
-const OPERATORS: [(&str, Token); 22] = [
+const OPERATORS: [(&str, Token); 23] = [
     // two-char ops
     ("!=", Token::NotEq),
     ("&&", Token::And),
@@ -37,6 +37,7 @@ const OPERATORS: [(&str, Token); 22] = [
     ("|>", Token::Pipe),
     ("||", Token::Or),
     // one-char ops
+    ("=", Token::Assign),
     ("!", Token::Not),
     ("(", Token::LParen),
     (")", Token::RParen),

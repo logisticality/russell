@@ -20,7 +20,7 @@ pub(super) fn parse_stmnt(parser: &mut Parser) -> ParseResult<Stmnt> {
 fn parse_let(parser: &mut Parser) -> ParseResult<Stmnt> {
     parser.expect(TokenKind::Let)?;
     let id = parser.expect_id()?;
-    parser.expect(TokenKind::Eq)?;
+    parser.expect(TokenKind::Assign)?;
     let expr = parse_expr(parser)?;
     parser.expect(TokenKind::Semicolon)?;
     Ok(Stmnt::Let(id, expr))

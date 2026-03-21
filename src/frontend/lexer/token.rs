@@ -35,6 +35,7 @@ pub enum Token {
     RBrace,
 
     // operators
+    Assign,
     Not,
     NotEq,
     And,
@@ -92,6 +93,7 @@ pub enum TokenKind {
     RBrace,
 
     // operators
+    Assign,
     Not,
     NotEq,
     And,
@@ -141,6 +143,7 @@ impl Token {
             Token::Semicolon => TokenKind::Semicolon,
             Token::LBrace => TokenKind::LBrace,
             Token::RBrace => TokenKind::RBrace,
+            Token::Assign => TokenKind::Assign,
             Token::Not => TokenKind::Not,
             Token::NotEq => TokenKind::NotEq,
             Token::And => TokenKind::And,
