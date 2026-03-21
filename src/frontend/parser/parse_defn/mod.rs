@@ -22,10 +22,11 @@ fn parse_typedef(parser: &mut Parser) -> ParseResult<Defn> {
 
     // parse all product types in the ADT
     let mut signatures = Vec::new();
-    while parser.peek().kind() != TokenKind::RBrace {
-        match parse_fn_sig(parser) {
-            Ok(signature) => signatures.push(signature),
-            Err(_) => unimplemented!(), // TODO improve error handling
+    if parser.peek().kind() != TokenKind::RBrace {
+        signatures.push(parse_fn_sig(parser)?);
+        while parser.peek().kind() == TokenKind::Comma {
+            parser.tokens.next(); // consume comma
+            signatures.push(parse_fn_sig(parser)?);
         }
     }
 
