@@ -95,6 +95,12 @@ impl Parser {
         // EoF sentinel ensures this is always Some
         self.tokens.peek().unwrap()
     }
+
+    // Unconditionally consume and return the next token.
+    pub(super) fn advance(&mut self) -> Token {
+        // EoF sentinel ensures this is always Some
+        self.tokens.next().unwrap()
+    }
 }
 
 pub struct ParseError {
