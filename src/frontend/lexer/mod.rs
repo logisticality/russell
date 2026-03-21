@@ -125,10 +125,13 @@ fn eat_whitespace(program: &str) -> &str {
 }
 
 fn read_num(program: &str) -> (Token, &str) {
-    // greedily grab all characters until we see something that's not a digit
+    // greedily grab all characters that form a number, allowing at most one '.'
+    let mut seen_dot = false;
     let mut first_non_digit = program.len();
     for (index, char) in program.char_indices() {
-        if !char.is_ascii_digit() {
+        if char == '.' && !seen_dot {
+            seen_dot = true;
+        } else if !char.is_ascii_digit() {
             first_non_digit = index;
             break;
         }
@@ -136,9 +139,10 @@ fn read_num(program: &str) -> (Token, &str) {
     let digits = &program[..first_non_digit];
     let rest = &program[first_non_digit..];
 
-    match digits.find('.') {
-        Some(_) => (Token::Float(digits.parse::<f64>().unwrap()), rest),
-        None => (Token::Int(digits.parse::<i64>().unwrap()), rest),
+    if seen_dot {
+        (Token::Float(digits.parse::<f64>().unwrap()), rest)
+    } else {
+        (Token::Int(digits.parse::<i64>().unwrap()), rest)
     }
 }
 
