@@ -26,10 +26,6 @@ fn main() -> ExitCode {
     // lex the program
     let tokens = lexer::lex(&program);
 
-    for token in &tokens {
-        println!("{:?}", token)
-    }
-
     // parse the program
     let defns = parser::parse(tokens);
 

@@ -19,9 +19,9 @@ pub(super) fn parse_type(parser: &mut Parser) -> ParseResult<Type> {
 
     // if we see an arrow, parse the right-hand side of the function type
     if parser.peek().kind() == TokenKind::Arrow {
-        parser.expect(TokenKind::Arrow)?;
+        parser.advance();
         let r_type = parse_type(parser)?;
-        return Ok(Type::Fn(Box::from(l_type), Box::from(r_type)));
+        return Ok(Type::Fn(Box::new(l_type), Box::new(r_type)));
     }
 
     // otherwise, there's no right-hand side
@@ -43,7 +43,7 @@ pub(super) fn parse_binding_list(parser: &mut Parser) -> ParseResult<Vec<Binding
     if parser.peek().kind() != TokenKind::RParen {
         bindings.push(parse_binding(parser)?);
         while parser.peek().kind() == TokenKind::Comma {
-            parser.expect(TokenKind::Comma)?;
+            parser.advance();
             bindings.push(parse_binding(parser)?);
         }
     }
