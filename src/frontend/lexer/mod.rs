@@ -158,7 +158,7 @@ fn read_ident(program: &str) -> (Token, &str) {
     let ident = &program[..first_non_letter];
     let rest = &program[first_non_letter..];
 
-    // check against keywords, fallback to identifier (varable) if no match
+    // check against keywords, fallback to identifier (variable) if no match
     for (keyword_str, keyword_token) in KEYWORDS {
         if ident == keyword_str {
             return (keyword_token, rest);

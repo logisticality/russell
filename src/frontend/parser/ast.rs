@@ -5,10 +5,10 @@ pub enum Defn {
     Typedef(String, Vec<(String, Vec<Binding>)>),
 
     // fn <id>( <binding> , ... ) -> <type> { <stmnt>; ... }
-    Fn(String, Vec<Binding>, Type, Vec<Stmnt>),
+    Fn(String, Vec<Binding>, Type, Vec<Stmt>),
 }
 
-pub enum Stmnt {
+pub enum Stmt {
     Let(String, Expr),  // let <id> = <expr>;
     Read(Type, String), // read <type> <id>;
     Echo(Type, Expr),   // echo <type> <expr>;

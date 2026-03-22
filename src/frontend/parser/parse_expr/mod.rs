@@ -16,9 +16,9 @@ enum Precedence {
     Call = 8, // function call (postfix)
 }
 
-impl Token {
-    fn prec(&self) -> Precedence {
-        match self {
+impl Precedence {
+    fn of(token: &Token) -> Precedence {
+        match token {
             Token::Times | Token::Divide => Precedence::Mult,
             Token::Plus | Token::Minus => Precedence::Add,
             Token::LessThan | Token::LessThanOrEq | Token::GreaterThan | Token::GreaterThanOrEq => Precedence::Rel,
@@ -40,7 +40,7 @@ fn parse_expr_prec(parser: &mut Parser, min_prec: Precedence) -> ParseResult<Exp
     let mut left = parse_null_denotation(parser)?;
 
     loop {
-        let prec = parser.peek().prec();
+        let prec = Precedence::of(parser.peek());
         if prec <= min_prec {
             break;
         }
