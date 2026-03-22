@@ -114,6 +114,18 @@ pub enum TokenKind {
     EoF,
 }
 
+#[derive(Debug, Clone)]
+pub struct SpannedToken {
+    pub token: Token,
+    pub offset: usize,
+}
+
+impl SpannedToken {
+    pub fn kind(&self) -> TokenKind {
+        self.token.kind()
+    }
+}
+
 impl Token {
     pub fn kind(&self) -> TokenKind {
         match self {

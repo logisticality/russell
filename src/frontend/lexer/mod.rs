@@ -1,6 +1,6 @@
 pub mod token;
 
-use crate::frontend::lexer::token::Token;
+use crate::frontend::lexer::token::{SpannedToken, Token};
 
 // reserved keywords
 const KEYWORDS: [(&str, Token); 12] = [
@@ -54,17 +54,22 @@ const OPERATORS: [(&str, Token); 23] = [
     ("}", Token::RBrace),
 ];
 
-/// Given the entire program as a string, lexes it into a vector of tokens.
-pub fn lex(program: &str) -> Vec<Token> {
+/// Given the entire program as a string, lexes it into a vector of spanned tokens.
+pub fn lex(program: &str) -> Vec<SpannedToken> {
+    let base = program.as_ptr() as usize;
     let mut tokens = Vec::new();
-    let mut token;
-    let mut rest_program = program;
-    let mut done_lexing = false;
+    let mut rest = program;
 
-    while !done_lexing {
-        (token, rest_program) = next_token(rest_program);
-        done_lexing = matches!(token, Token::EoF);
-        tokens.push(token);
+    loop {
+        rest = eat_whitespace(rest);
+        let offset = rest.as_ptr() as usize - base;
+        let (token, remaining) = next_token(rest);
+        let done = matches!(token, Token::EoF);
+        tokens.push(SpannedToken { token, offset });
+        rest = remaining;
+        if done {
+            break;
+        }
     }
 
     tokens
@@ -72,9 +77,8 @@ pub fn lex(program: &str) -> Vec<Token> {
 
 /// Lexes the next token in the given program.
 /// Returns the token, and the rest of the program, which has not been lexed.
+/// Assumes leading whitespace has already been consumed.
 fn next_token(program: &str) -> (Token, &str) {
-    // eat whitespace at the start, and use first char to determine token type
-    let program = eat_whitespace(program);
     let first_char = match program.chars().next() {
         Some(c) => c,
         None => return (Token::EoF, program),
@@ -82,8 +86,8 @@ fn next_token(program: &str) -> (Token, &str) {
 
     // determine if the token is an operator
     for (op_str, op_token) in OPERATORS {
-        if program.starts_with(op_str) {
-            return (op_token, &program[op_str.len()..]);
+        if let Some(rest) = program.strip_prefix(op_str) {
+            return (op_token, rest);
         }
     }
 
@@ -112,7 +116,7 @@ fn eat_whitespace(program: &str) -> &str {
     while s.starts_with("//") {
         s = match s.find('\n') {
             Some(i) => &s[i + 1..],
-            None => "",
+            None => &s[s.len()..],
         };
         s = s.trim_start();
     }
