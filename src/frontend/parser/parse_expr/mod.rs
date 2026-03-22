@@ -70,7 +70,7 @@ fn parse_null_denotation(parser: &mut Parser) -> ParseResult<Expr> {
         TokenKind::If => parse_if_expr(parser),
         TokenKind::Match => parse_match_expr(parser),
         _ => ParseError::many(
-            vec![
+            &[
                 TokenKind::Int,
                 TokenKind::Float,
                 TokenKind::Bool,

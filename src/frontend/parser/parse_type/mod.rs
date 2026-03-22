@@ -4,7 +4,7 @@ use crate::frontend::parser::{ParseResult, Parser};
 
 pub(super) fn parse_type(parser: &mut Parser) -> ParseResult<Type> {
     // parse an atomic type
-    let l_type = match parser.expect_many(vec![
+    let l_type = match parser.expect_many(&[
         TokenKind::IntType,
         TokenKind::FloatType,
         TokenKind::BoolType,

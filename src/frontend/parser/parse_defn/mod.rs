@@ -8,7 +8,7 @@ pub(super) fn parse_defn(parser: &mut Parser) -> ParseResult<Defn> {
     match parser.peek() {
         Token::Fn => parse_fndef(parser),
         Token::Typedef => parse_typedef(parser),
-        _ => ParseError::many(vec![TokenKind::Fn, TokenKind::Typedef], parser.peek().clone()),
+        _ => ParseError::many(&[TokenKind::Fn, TokenKind::Typedef], parser.peek().clone()),
     }
 }
 
