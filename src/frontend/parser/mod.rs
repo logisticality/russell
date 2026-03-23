@@ -8,11 +8,11 @@ mod parse_type;
 use std::iter::Peekable;
 use std::vec::IntoIter;
 
-use crate::frontend::lexer::token::{Token, TokenKind};
+use crate::frontend::lexer::token::{SpannedToken, Token, TokenKind};
 use crate::frontend::parser::ast::Defn;
 use crate::frontend::parser::parse_defn::parse_defn;
 
-pub fn parse(tokens: Vec<Token>) -> Vec<Defn> {
+pub fn parse(tokens: Vec<SpannedToken>) -> Vec<Defn> {
     let mut parser = Parser::new(tokens);
     let mut defns = Vec::new();
 
@@ -27,11 +27,11 @@ pub fn parse(tokens: Vec<Token>) -> Vec<Defn> {
 }
 
 pub struct Parser {
-    tokens: Peekable<IntoIter<Token>>,
+    tokens: Peekable<IntoIter<SpannedToken>>,
 }
 
 impl Parser {
-    pub fn new(tokens: Vec<Token>) -> Parser {
+    pub fn new(tokens: Vec<SpannedToken>) -> Parser {
         Parser {
             tokens: tokens.into_iter().peekable(),
         }
@@ -42,62 +42,68 @@ impl Parser {
             self.tokens.next();
             Ok(())
         } else {
-            ParseError::new(expected, self.peek().clone())
+            ParseError::new(expected, self.peek())
         }
     }
 
     pub fn expect_id(&mut self) -> ParseResult<String> {
-        match self.tokens.next_if(|t| t.kind() == TokenKind::Id) {
+        match self.take_if(TokenKind::Id) {
             Some(Token::Id(name)) => Ok(name),
-            _ => ParseError::new(TokenKind::Id, self.peek().clone()),
+            _ => ParseError::new(TokenKind::Id, self.peek()),
         }
     }
 
     pub fn expect_int(&mut self) -> ParseResult<i64> {
-        match self.tokens.next_if(|t| t.kind() == TokenKind::Int) {
+        match self.take_if(TokenKind::Int) {
             Some(Token::Int(val)) => Ok(val),
-            _ => ParseError::new(TokenKind::Int, self.peek().clone()),
+            _ => ParseError::new(TokenKind::Int, self.peek()),
         }
     }
 
     pub fn expect_float(&mut self) -> ParseResult<f64> {
-        match self.tokens.next_if(|t| t.kind() == TokenKind::Float) {
+        match self.take_if(TokenKind::Float) {
             Some(Token::Float(val)) => Ok(val),
-            _ => ParseError::new(TokenKind::Float, self.peek().clone()),
+            _ => ParseError::new(TokenKind::Float, self.peek()),
         }
     }
 
     pub fn expect_bool(&mut self) -> ParseResult<bool> {
-        match self.tokens.next_if(|t| t.kind() == TokenKind::Bool) {
+        match self.take_if(TokenKind::Bool) {
             Some(Token::Bool(val)) => Ok(val),
-            _ => ParseError::new(TokenKind::Bool, self.peek().clone()),
+            _ => ParseError::new(TokenKind::Bool, self.peek()),
         }
     }
 
     pub fn expect_typeid(&mut self) -> ParseResult<String> {
-        match self.tokens.next_if(|t| t.kind() == TokenKind::TypeId) {
+        match self.take_if(TokenKind::TypeId) {
             Some(Token::TypeId(name)) => Ok(name),
-            _ => ParseError::new(TokenKind::TypeId, self.peek().clone()),
+            _ => ParseError::new(TokenKind::TypeId, self.peek()),
         }
+    }
+
+    fn take_if(&mut self, kind: TokenKind) -> Option<Token> {
+        self.tokens
+            .next_if(|t| t.kind() == kind)
+            .map(|t| t.token)
     }
 
     pub fn expect_many(&mut self, expected: &[TokenKind]) -> ParseResult<Token> {
-        for token in expected {
-            if self.peek().kind() == *token {
-                return Ok(self.tokens.next().unwrap());
+        for kind in expected {
+            if self.peek().kind() == *kind {
+                return Ok(self.tokens.next().unwrap().token);
             }
         }
 
-        ParseError::many(expected, self.peek().clone())
+        ParseError::many(expected, self.peek())
     }
 
-    pub fn peek(&mut self) -> &Token {
+    pub fn peek(&mut self) -> &SpannedToken {
         // EoF sentinel ensures this is always Some
         self.tokens.peek().unwrap()
     }
 
     // Unconditionally consume and return the next token.
-    pub(super) fn advance(&mut self) -> Token {
+    pub(super) fn advance(&mut self) -> SpannedToken {
         // EoF sentinel ensures this is always Some
         self.tokens.next().unwrap()
     }
@@ -107,20 +113,23 @@ pub struct ParseError {
     // TODO - should implement Error
     expected: Vec<TokenKind>,
     actual: Token,
+    offset: usize,
 }
 
 impl ParseError {
-    pub fn new<A>(expected: TokenKind, actual: Token) -> ParseResult<A> {
+    pub fn new<A>(expected: TokenKind, actual: &SpannedToken) -> ParseResult<A> {
         Err(ParseError {
             expected: vec![expected],
-            actual,
+            actual: actual.token.clone(),
+            offset: actual.offset,
         })
     }
 
-    pub fn many<A>(expected: &[TokenKind], actual: Token) -> ParseResult<A> {
+    pub fn many<A>(expected: &[TokenKind], actual: &SpannedToken) -> ParseResult<A> {
         Err(ParseError {
             expected: expected.to_vec(),
-            actual,
+            actual: actual.token.clone(),
+            offset: actual.offset,
         })
     }
 }

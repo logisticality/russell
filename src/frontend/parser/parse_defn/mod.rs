@@ -1,14 +1,14 @@
-use crate::frontend::lexer::token::{Token, TokenKind};
+use crate::frontend::lexer::token::TokenKind;
 use crate::frontend::parser::ast::{Binding, Defn};
 use crate::frontend::parser::parse_stmnt::parse_stmnt;
 use crate::frontend::parser::parse_type::{parse_binding_list, parse_type};
 use crate::frontend::parser::{ParseError, ParseResult, Parser};
 
 pub(super) fn parse_defn(parser: &mut Parser) -> ParseResult<Defn> {
-    match parser.peek() {
-        Token::Fn => parse_fndef(parser),
-        Token::Typedef => parse_typedef(parser),
-        _ => ParseError::many(&[TokenKind::Fn, TokenKind::Typedef], parser.peek().clone()),
+    match parser.peek().kind() {
+        TokenKind::Fn => parse_fndef(parser),
+        TokenKind::Typedef => parse_typedef(parser),
+        _ => ParseError::many(&[TokenKind::Fn, TokenKind::Typedef], parser.peek()),
     }
 }
 

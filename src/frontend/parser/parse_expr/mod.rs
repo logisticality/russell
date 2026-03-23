@@ -40,7 +40,7 @@ fn parse_expr_prec(parser: &mut Parser, min_prec: Precedence) -> ParseResult<Exp
     let mut left = parse_null_denotation(parser)?;
 
     loop {
-        let prec = Precedence::of(parser.peek());
+        let prec = Precedence::of(&parser.peek().token);
         if prec <= min_prec {
             break;
         }
@@ -52,7 +52,7 @@ fn parse_expr_prec(parser: &mut Parser, min_prec: Precedence) -> ParseResult<Exp
         }
 
         // Binary operator
-        let op = parser.advance();
+        let op = parser.advance().token;
         let right = parse_expr_prec(parser, prec)?;
         left = Expr::binop(op, left, right);
     }
@@ -82,7 +82,7 @@ fn parse_null_denotation(parser: &mut Parser) -> ParseResult<Expr> {
                 TokenKind::If,
                 TokenKind::Match,
             ],
-            parser.peek().clone(),
+            parser.peek(),
         ),
     }
 }
@@ -98,7 +98,7 @@ fn parse_atom_expr(parser: &mut Parser) -> ParseResult<Expr> {
 }
 
 fn parse_unary_expr(parser: &mut Parser) -> ParseResult<Expr> {
-    match parser.advance() {
+    match parser.advance().token {
         Token::Minus => Ok(Expr::Neg(Box::new(parse_expr_prec(parser, Precedence::Mult)?))),
         Token::Not => Ok(Expr::Bang(Box::new(parse_expr_prec(parser, Precedence::Mult)?))),
         _ => unreachable!(),
