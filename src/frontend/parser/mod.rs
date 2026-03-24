@@ -2,8 +2,11 @@ pub mod ast;
 
 mod parse_defn;
 mod parse_expr;
-mod parse_stmnt;
+mod parse_stmt;
 mod parse_type;
+
+#[cfg(test)]
+mod tests;
 
 use std::iter::Peekable;
 use std::vec::IntoIter;
@@ -82,9 +85,7 @@ impl Parser {
     }
 
     fn take_if(&mut self, kind: TokenKind) -> Option<Token> {
-        self.tokens
-            .next_if(|t| t.kind() == kind)
-            .map(|t| t.token)
+        self.tokens.next_if(|t| t.kind() == kind).map(|t| t.token)
     }
 
     pub fn expect_many(&mut self, expected: &[TokenKind]) -> ParseResult<Token> {
@@ -109,6 +110,7 @@ impl Parser {
     }
 }
 
+#[derive(Debug)]
 pub struct ParseError {
     // TODO - should implement Error
     expected: Vec<TokenKind>,

@@ -182,7 +182,7 @@ fn read_type_ident(program: &str) -> (Token, &str) {
     let ident = &program[..first_non_letter];
     let rest = &program[first_non_letter..];
 
-    // check against keywords, fallback to identifier (varable) if no match
+    // check against keywords, fallback to identifier (variable) if no match
     for (type_str, type_token) in TYPES {
         if ident == type_str {
             return (type_token, rest);
