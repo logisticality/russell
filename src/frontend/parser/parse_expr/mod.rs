@@ -3,9 +3,12 @@ use crate::frontend::parser::ast::Expr;
 use crate::frontend::parser::parse_type::{parse_binding, parse_binding_list};
 use crate::frontend::parser::{ParseError, ParseResult, Parser};
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Eq, PartialEq, PartialOrd, Ord, Copy, Clone)]
 enum Precedence {
-    NotBinOp = isize::MIN,
+    NotBinOp = -1,
     Pipe = 1, // pipe: |>
     Or = 2,   // logical or: ||
     And = 3,  // logical and: &&

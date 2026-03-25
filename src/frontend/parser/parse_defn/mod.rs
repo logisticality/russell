@@ -1,8 +1,11 @@
 use crate::frontend::lexer::token::TokenKind;
 use crate::frontend::parser::ast::{Binding, Defn};
-use crate::frontend::parser::parse_stmnt::parse_stmnt;
+use crate::frontend::parser::parse_stmt::parse_stmnt;
 use crate::frontend::parser::parse_type::{parse_binding_list, parse_type};
 use crate::frontend::parser::{ParseError, ParseResult, Parser};
+
+#[cfg(test)]
+mod tests;
 
 pub(super) fn parse_defn(parser: &mut Parser) -> ParseResult<Defn> {
     match parser.peek().kind() {
@@ -25,7 +28,7 @@ fn parse_typedef(parser: &mut Parser) -> ParseResult<Defn> {
     if parser.peek().kind() != TokenKind::RBrace {
         signatures.push(parse_fn_sig(parser)?);
         while parser.peek().kind() == TokenKind::Comma {
-            parser.tokens.next(); // consume comma
+            parser.advance();
             signatures.push(parse_fn_sig(parser)?);
         }
     }

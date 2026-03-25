@@ -2,6 +2,9 @@ use crate::frontend::lexer::token::{Token, TokenKind};
 use crate::frontend::parser::ast::{Binding, Type};
 use crate::frontend::parser::{ParseResult, Parser};
 
+#[cfg(test)]
+mod tests;
+
 pub(super) fn parse_type(parser: &mut Parser) -> ParseResult<Type> {
     // parse an atomic type
     let l_type = match parser.expect_many(&[

@@ -1,5 +1,6 @@
 use crate::frontend::lexer::token::Token;
 
+#[derive(Debug, PartialEq)]
 pub enum Defn {
     // typedef <typeId> { <id> ( <binding> , ... ) , ... };
     Typedef(String, Vec<(String, Vec<Binding>)>),
@@ -8,6 +9,7 @@ pub enum Defn {
     Fn(String, Vec<Binding>, Type, Vec<Stmt>),
 }
 
+#[derive(Debug, PartialEq)]
 pub enum Stmt {
     Let(String, Expr),  // let <id> = <expr>;
     Read(Type, String), // read <type> <id>;
@@ -15,6 +17,7 @@ pub enum Stmt {
     Return(Expr),       // return <expr>;
 }
 
+#[derive(Debug, PartialEq)]
 pub enum Expr {
     // atomic expressions
     Int(i64),
@@ -78,6 +81,7 @@ impl Expr {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub enum Type {
     Int,
     Float,
@@ -86,6 +90,7 @@ pub enum Type {
     Fn(Box<Type>, Box<Type>),
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Binding {
     pub id: String,
     pub typ: Type,
