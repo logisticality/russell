@@ -162,7 +162,7 @@ Expressions of the form `<A> > <B>` are:
 - If `<A>` and `<B>` both evaluate to floats, the Boolean true if and only if `<A>` is greater than `<B>`.
 - Otherwise, the expression will cause a type error.
 
-Expressions of the form `<A> >= <B>` will evaluate to an expression equivalent to `<A> < <B> || <A> == <B>`.
+Expressions of the form `<A> >= <B>` will evaluate to an expression equivalent to `<A> > <B> || <A> == <B>`.
 
 Expressions of the form `<A> == <B>` are:
 - If `<A>` and `<B>` both evaluate to integers, the Boolean true if and only if `<A>` is equal to `<B>`.
@@ -181,5 +181,22 @@ Expressions of the form `if <A> then <B> else <C>` will evaluate to:
 - Otherwise, the expression will cause a type error.
 
 Expressions of the form `( <expr> )` will evaluate to an expression equivalent to `<expr>`.
+
+=== Binary Operators
+The grammar contains a variety of binary operators. All binary expressions are left-associative (i.e., `+`, `-`, `*`, `/`, `<`, `<=`, `>`, `>=`, `==`, `!=`, `||`, `&&`, `|>`). Function type annotations (`->`) are right-associative.
+
+The precedence of binary expressions follows the below chart.
+#table(
+  columns: 3,
+  [*Level*], [*Operators*], [*Notes*],
+  [8 (highest)], [`f(...)`], [function call (postfix)],
+  [7], [`*`, `/`], [multiplicative],
+  [6], [`+`, `-`], [additive],
+  [5], [`<`, `<=`, `>`, `>=`], [relational],
+  [4], [`==`, `!=`], [equality],
+  [3], [`&&`], [logical and],
+  [2], [`||`], [logical or],
+  [1 (lowest)], [`|>`], [pipe],
+)
 
 === Standard Library
