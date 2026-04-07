@@ -110,7 +110,7 @@ fn next_token(program: &str) -> (Token, &str) {
     }
 
     // otherwise, the token is invalid
-    (Token::Invalid(first_char), &program[1..])
+    (Token::Invalid(first_char), &program[first_char.len_utf8()..])
 }
 
 /// Discards any whitespace or comments at the start of `program`.
