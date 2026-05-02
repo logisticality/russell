@@ -1,7 +1,8 @@
+use crate::frontend::error::parse_error::{ParseError, ParseResult};
 use crate::frontend::lexer::token::{Token, TokenKind};
-use crate::frontend::parser::ast::Expr;
+use crate::frontend::parser::Parser;
+use crate::frontend::parser::ast::{Binding, Expr};
 use crate::frontend::parser::parse_type::{parse_binding, parse_binding_list};
-use crate::frontend::parser::{ParseError, ParseResult, Parser};
 
 #[cfg(test)]
 mod tests;
@@ -167,9 +168,7 @@ fn parse_call_expr(parser: &mut Parser, left: Expr) -> ParseResult<Expr> {
 
 // parse match arms: <id>(<binding>, ...) -> <expr>, ...
 // arms are comma-separated and end at '}'.
-fn parse_match_arms(
-    parser: &mut Parser,
-) -> ParseResult<Vec<(String, Vec<crate::frontend::parser::ast::Binding>, Expr)>> {
+fn parse_match_arms(parser: &mut Parser) -> ParseResult<Vec<(String, Vec<Binding>, Expr)>> {
     let mut arms = Vec::new();
 
     while parser.peek().kind() != TokenKind::RBrace {

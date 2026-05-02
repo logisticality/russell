@@ -1,6 +1,7 @@
 use crate::frontend::lexer::token::{Token, TokenKind};
 use crate::frontend::parser::ast::{Binding, Type};
-use crate::frontend::parser::{ParseResult, Parser};
+use crate::frontend::error::parse_error::ParseResult;
+use crate::frontend::parser::Parser;
 
 #[cfg(test)]
 mod tests;

@@ -11,6 +11,7 @@ mod tests;
 use std::iter::Peekable;
 use std::vec::IntoIter;
 
+use crate::frontend::error::parse_error::{ParseError, ParseResult};
 use crate::frontend::lexer::token::{SpannedToken, Token, TokenKind};
 use crate::frontend::parser::ast::Defn;
 use crate::frontend::parser::parse_defn::parse_defn;
@@ -110,30 +111,3 @@ impl Parser {
     }
 }
 
-#[derive(Debug)]
-pub struct ParseError {
-    // TODO - should implement Error
-    expected: Vec<TokenKind>,
-    actual: Token,
-    offset: usize,
-}
-
-impl ParseError {
-    pub fn new<A>(expected: TokenKind, actual: &SpannedToken) -> ParseResult<A> {
-        Err(ParseError {
-            expected: vec![expected],
-            actual: actual.token.clone(),
-            offset: actual.offset,
-        })
-    }
-
-    pub fn many<A>(expected: &[TokenKind], actual: &SpannedToken) -> ParseResult<A> {
-        Err(ParseError {
-            expected: expected.to_vec(),
-            actual: actual.token.clone(),
-            offset: actual.offset,
-        })
-    }
-}
-
-pub type ParseResult<A> = Result<A, ParseError>;
