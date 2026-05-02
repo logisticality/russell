@@ -2,6 +2,7 @@ use std::{collections::HashMap, rc::Rc};
 
 use crate::frontend::parser::ast::{Binding, Expr, Stmt};
 
+#[derive(Debug)]
 pub(super) struct Env {
     pub next: Option<Rc<Env>>,
     pub binding: (String, Rc<Value>),
@@ -44,6 +45,7 @@ impl Env {
     }
 }
 
+#[derive(Debug)]
 pub(super) enum Value {
     Int(i64),
     Float(f64),
