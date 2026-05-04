@@ -5,6 +5,8 @@ use crate::{
     interpreter::treewalk::{Env, types::Value},
 };
 
+enum ArithOp { Plus, Minus, Mult, Div }
+
 pub(super) fn interp_expr(expr: Expr, env: Rc<Env>) -> Rc<Value> {
     match expr {
         Expr::Int(num) => Value::Int(num).into(),
@@ -15,10 +17,10 @@ pub(super) fn interp_expr(expr: Expr, env: Rc<Env>) -> Rc<Value> {
         Expr::Neg(expr) => interp_neg(*expr, env),
         Expr::Bang(expr) => interp_bang(*expr, env),
         Expr::Call(func, args) => todo!(),
-        Expr::Plus(left, right) => todo!(),
-        Expr::Minus(left, right) => todo!(),
-        Expr::Mult(left, right) => todo!(),
-        Expr::Div(left, right) => todo!(),
+        Expr::Plus(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Plus),
+        Expr::Minus(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Minus),
+        Expr::Mult(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Mult),
+        Expr::Div(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Div),
         Expr::Pipe(left, right) => todo!(),
         Expr::Less(left, right) => todo!(),
         Expr::LessEq(left, right) => todo!(),
@@ -52,5 +54,29 @@ fn interp_bang(expr: Expr, env: Rc<Env>) -> Rc<Value> {
     match &*interp_expr(expr, env) {
         Value::Bool(val) => Value::Bool(!val).into(),
         val => panic!("FATAL ERROR: expected boolean value, found {val:?}"),
+    }
+}
+
+fn interp_call(expr: Expr, env: Rc<Env>) -> Rc<Value> {
+    todo!()
+}
+
+fn interp_arith_binop(left: Expr, right: Expr, env: Rc<Env>, op: ArithOp) -> Rc<Value> {
+    let left_val = interp_expr(left, Rc::clone(&env));
+    let right_val = interp_expr(right, env);
+    match (&*left_val, &*right_val) {
+        (Value::Int(l), Value::Int(r)) => Value::Int(match op {
+            ArithOp::Plus => l + r,
+            ArithOp::Minus => l - r,
+            ArithOp::Mult => l * r,
+            ArithOp::Div => l / r,
+        }).into(),
+        (Value::Float(l), Value::Float(r)) => Value::Float(match op {
+            ArithOp::Plus => l + r,
+            ArithOp::Minus => l - r,
+            ArithOp::Mult => l * r,
+            ArithOp::Div => l / r,
+        }).into(),
+        (l, r) => panic!("FATAL ERROR: type mismatch: {l:?} and {r:?}"),
     }
 }
