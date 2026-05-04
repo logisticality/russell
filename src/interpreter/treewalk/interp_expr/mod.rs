@@ -6,6 +6,7 @@ use crate::{
 };
 
 enum ArithOp { Plus, Minus, Mult, Div }
+enum CmpOp { Less, LessEq, Greater, GreaterEq, Eq, NotEq }
 enum BoolOp { Or, And }
 
 pub(super) fn interp_expr(expr: Expr, env: Rc<Env>) -> Rc<Value> {
@@ -23,12 +24,12 @@ pub(super) fn interp_expr(expr: Expr, env: Rc<Env>) -> Rc<Value> {
         Expr::Mult(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Mult),
         Expr::Div(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Div),
         Expr::Pipe(left, right) => todo!(),
-        Expr::Less(left, right) => todo!(),
-        Expr::LessEq(left, right) => todo!(),
-        Expr::Greater(left, right) => todo!(),
-        Expr::GreaterEq(left, right) => todo!(),
-        Expr::Eq(left, right) => todo!(),
-        Expr::NotEq(left, right) => todo!(),
+        Expr::Less(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::Less),
+        Expr::LessEq(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::LessEq),
+        Expr::Greater(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::Greater),
+        Expr::GreaterEq(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::GreaterEq),
+        Expr::Eq(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::Eq),
+        Expr::NotEq(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::NotEq),
         Expr::Or(left, right) => interp_bool_binop(*left, *right, env, BoolOp::Or),
         Expr::And(left, right) => interp_bool_binop(*left, *right, env, BoolOp::And),
         Expr::If(cond, then_expr, else_expr) => todo!(),
@@ -77,6 +78,30 @@ fn interp_arith_binop(left: Expr, right: Expr, env: Rc<Env>, op: ArithOp) -> Rc<
             ArithOp::Minus => l - r,
             ArithOp::Mult => l * r,
             ArithOp::Div => l / r,
+        }).into(),
+        (l, r) => panic!("FATAL ERROR: type mismatch: {l:?} and {r:?}"),
+    }
+}
+
+fn interp_cmp_binop(left: Expr, right: Expr, env: Rc<Env>, op: CmpOp) -> Rc<Value> {
+    let left_val = interp_expr(left, Rc::clone(&env));
+    let right_val = interp_expr(right, env);
+    match (&*left_val, &*right_val) {
+        (Value::Int(l), Value::Int(r)) => Value::Bool(match op {
+            CmpOp::Less => l < r,
+            CmpOp::LessEq => l <= r,
+            CmpOp::Greater => l > r,
+            CmpOp::GreaterEq => l >= r,
+            CmpOp::Eq => l == r,
+            CmpOp::NotEq => l != r,
+        }).into(),
+        (Value::Float(l), Value::Float(r)) => Value::Bool(match op {
+            CmpOp::Less => l < r,
+            CmpOp::LessEq => l <= r,
+            CmpOp::Greater => l > r,
+            CmpOp::GreaterEq => l >= r,
+            CmpOp::Eq => l == r,
+            CmpOp::NotEq => l != r,
         }).into(),
         (l, r) => panic!("FATAL ERROR: type mismatch: {l:?} and {r:?}"),
     }
