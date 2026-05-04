@@ -2,11 +2,8 @@ use std::rc::Rc;
 
 use crate::{
     frontend::parser::ast::Expr,
-    interpreter::treewalk::{Env, types::Value},
+    interpreter::treewalk::{types::Value, Env},
 };
-
-enum ArithOp { Plus, Minus, Mult, Div }
-enum CmpOp { Less, LessEq, Greater, GreaterEq, Eq, NotEq }
 
 pub(super) fn interp_expr(expr: Expr, env: Rc<Env>) -> Rc<Value> {
     match expr {
@@ -18,17 +15,17 @@ pub(super) fn interp_expr(expr: Expr, env: Rc<Env>) -> Rc<Value> {
         Expr::Neg(expr) => interp_neg(*expr, env),
         Expr::Bang(expr) => interp_bang(*expr, env),
         Expr::Call(func, args) => interp_call(*func, args, env),
-        Expr::Plus(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Plus),
-        Expr::Minus(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Minus),
-        Expr::Mult(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Mult),
-        Expr::Div(left, right) => interp_arith_binop(*left, *right, env, ArithOp::Div),
+        Expr::Plus(left, right) => interp_arith_binop(*left, *right, env, |l, r| l + r, |l, r| l + r),
+        Expr::Minus(left, right) => interp_arith_binop(*left, *right, env, |l, r| l - r, |l, r| l - r),
+        Expr::Mult(left, right) => interp_arith_binop(*left, *right, env, |l, r| l * r, |l, r| l * r),
+        Expr::Div(left, right) => interp_arith_binop(*left, *right, env, |l, r| l / r, |l, r| l / r),
         Expr::Pipe(left, right) => interp_call(*right, vec![*left], env),
-        Expr::Less(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::Less),
-        Expr::LessEq(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::LessEq),
-        Expr::Greater(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::Greater),
-        Expr::GreaterEq(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::GreaterEq),
-        Expr::Eq(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::Eq),
-        Expr::NotEq(left, right) => interp_cmp_binop(*left, *right, env, CmpOp::NotEq),
+        Expr::Less(left, right) => interp_cmp_binop(*left, *right, env, |l, r| l < r, |l, r| l < r),
+        Expr::LessEq(left, right) => interp_cmp_binop(*left, *right, env, |l, r| l <= r, |l, r| l <= r),
+        Expr::Greater(left, right) => interp_cmp_binop(*left, *right, env, |l, r| l > r, |l, r| l > r),
+        Expr::GreaterEq(left, right) => interp_cmp_binop(*left, *right, env, |l, r| l >= r, |l, r| l >= r),
+        Expr::Eq(left, right) => interp_cmp_binop(*left, *right, env, |l, r| l == r, |l, r| l == r),
+        Expr::NotEq(left, right) => interp_cmp_binop(*left, *right, env, |l, r| l != r, |l, r| l != r),
         Expr::Or(left, right) => interp_if(*left, Expr::Bool(true), *right, env),
         Expr::And(left, right) => interp_if(*left, *right, Expr::Bool(false), env),
         Expr::If(cond, then_expr, else_expr) => interp_if(*cond, *then_expr, *else_expr, env),
@@ -62,46 +59,34 @@ fn interp_call(func: Expr, args: Vec<Expr>, env: Rc<Env>) -> Rc<Value> {
     todo!()
 }
 
-fn interp_arith_binop(left: Expr, right: Expr, env: Rc<Env>, op: ArithOp) -> Rc<Value> {
+fn interp_arith_binop(
+    left: Expr,
+    right: Expr,
+    env: Rc<Env>,
+    int_op: fn(i64, i64) -> i64,
+    float_op: fn(f64, f64) -> f64,
+) -> Rc<Value> {
     let left_val = interp_expr(left, Rc::clone(&env));
     let right_val = interp_expr(right, env);
     match (&*left_val, &*right_val) {
-        (Value::Int(l), Value::Int(r)) => Value::Int(match op {
-            ArithOp::Plus => l + r,
-            ArithOp::Minus => l - r,
-            ArithOp::Mult => l * r,
-            ArithOp::Div => l / r,
-        }).into(),
-        (Value::Float(l), Value::Float(r)) => Value::Float(match op {
-            ArithOp::Plus => l + r,
-            ArithOp::Minus => l - r,
-            ArithOp::Mult => l * r,
-            ArithOp::Div => l / r,
-        }).into(),
+        (Value::Int(l), Value::Int(r)) => Value::Int(int_op(*l, *r)).into(),
+        (Value::Float(l), Value::Float(r)) => Value::Float(float_op(*l, *r)).into(),
         (l, r) => panic!("FATAL ERROR: type mismatch: {l:?} and {r:?}"),
     }
 }
 
-fn interp_cmp_binop(left: Expr, right: Expr, env: Rc<Env>, op: CmpOp) -> Rc<Value> {
+fn interp_cmp_binop(
+    left: Expr,
+    right: Expr,
+    env: Rc<Env>,
+    int_op: fn(i64, i64) -> bool,
+    float_op: fn(f64, f64) -> bool,
+) -> Rc<Value> {
     let left_val = interp_expr(left, Rc::clone(&env));
     let right_val = interp_expr(right, env);
     match (&*left_val, &*right_val) {
-        (Value::Int(l), Value::Int(r)) => Value::Bool(match op {
-            CmpOp::Less => l < r,
-            CmpOp::LessEq => l <= r,
-            CmpOp::Greater => l > r,
-            CmpOp::GreaterEq => l >= r,
-            CmpOp::Eq => l == r,
-            CmpOp::NotEq => l != r,
-        }).into(),
-        (Value::Float(l), Value::Float(r)) => Value::Bool(match op {
-            CmpOp::Less => l < r,
-            CmpOp::LessEq => l <= r,
-            CmpOp::Greater => l > r,
-            CmpOp::GreaterEq => l >= r,
-            CmpOp::Eq => l == r,
-            CmpOp::NotEq => l != r,
-        }).into(),
+        (Value::Int(l), Value::Int(r)) => Value::Bool(int_op(*l, *r)).into(),
+        (Value::Float(l), Value::Float(r)) => Value::Bool(float_op(*l, *r)).into(),
         (l, r) => panic!("FATAL ERROR: type mismatch: {l:?} and {r:?}"),
     }
 }
