@@ -1,6 +1,6 @@
 use std::{collections::HashMap, rc::Rc};
 
-use crate::frontend::parser::ast::{Binding, Expr, Stmt};
+use crate::frontend::parser::ast::{Binding, Expr, Stmt, Type};
 
 #[derive(Debug)]
 pub(super) struct Env {
@@ -8,29 +8,13 @@ pub(super) struct Env {
     pub binding: (String, Rc<Value>),
 }
 
-pub(super) struct Fn {
-    pub name: String,
-    pub bindings: Vec<Binding>,
-    pub statements: Vec<Stmt>,
-}
-
-impl Fn {
-    pub(super) fn new(name: String, bindings: Vec<Binding>, statements: Vec<Stmt>) -> Self {
-        Self {
-            name,
-            bindings,
-            statements,
-        }
-    }
-}
-
 impl Env {
     pub(super) fn new() -> Env {
-        unimplemented!()
+        todo!()
     }
 
     pub(super) fn extend(&self, id: String, val: Rc<Value>) -> Rc<Env> {
-        unimplemented!()
+        todo!()
     }
 
     pub(super) fn lookup(&self, key: &str) -> Option<Rc<Value>> {
@@ -51,5 +35,7 @@ pub(super) enum Value {
     Float(f64),
     Bool(bool),
     Closure(Rc<Env>, Binding, Box<Expr>),
-    Adt(String, HashMap<String, Rc<Value>>),
+    Constructor(String, Type, Vec<Binding>),
+    Fn(Vec<Binding>, Vec<Stmt>),
+    Adt(Type, String, HashMap<String, Rc<Value>>),
 }
